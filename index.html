@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Score Sheet</title>
+    <style>
+    /* General body styling */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        margin: 10px;
+        padding: 0;
+    }
+
+    h1 {
+        color: #4a90e2;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        color: #4a90e2;
+        margin-bottom: 10px;
+    }
+
+    button {
+        background-color: #4a90e2;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #357abd;
+    }
+
+    .dialog-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        opacity: 0;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .dialog-container > div {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        width: 300px;
+        text-align: center;
+    }
+
+    .field-set {
+        margin-top: 15px;
+        text-align: left;
+    }
+
+    .field-set label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .field-set input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    #closeAddDataBtn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    #addDataBtn {
+        background-color: #27ae60;
+        color: white;
+        border-radius: 5px;
+        border: none;
+        padding: 10px;
+        width: 100%;
+        margin-top: 15px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    #addDataBtn:hover {
+        background-color: #1e8449;
+    }
+
+    .delete-btn {
+        background-color: #e74c3c;
+        color: white;
+        border-radius: 5px;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .delete-btn:hover {
+        background-color: #c0392b;
+    }
+
+    .edit-btn {
+        background-color: #f39c12;
+        color: white;
+        border-radius: 5px;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .edit-btn:hover {
+        background-color: #d35400;
+    }
+
+    #info {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 1rem;
+        color: #555;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 90%;
+        margin: 20px auto;
+        background-color: white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #4a90e2;
+        color: white;
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    #searchBar {
+        margin: 20px auto;
+        padding: 10px;
+        width: 90%;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+
+    #sortByNameBtn {
+        display: block;
+        margin: 10px auto;
+        background-color: #4a90e2;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #sortByNameBtn:hover {
+        background-color: #357abd;
+    }
+</style>
+</head>
+<body>
+    <h1>Student Score Sheet</h1>
+    <button id="addDataDialogBtn">Add Data</button>
+    <input type="text" id="searchBar" placeholder="Search by name">
+    <button id="sortByNameBtn">Sort by Name</button>
+    <div id="info"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Position</th>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="list"></tbody>
+    </table> 
+    <!-- Dialog -->
+    <div class="dialog-container" id="dialogContainer">
+        <div>
+            <h2>Add Data</h2>
+            <div class="field-set">
+                <label for="name">Name</label>
+                <input type="text" id="name">                
+            </div>
+            <div class="field-set">
+                <label for="score">Score</label>
+                <input type="number" id="score">
+            </div>
+            <button id="addDataBtn">Add</button>
+            <button id="closeAddDataBtn">X</button>
+        </div>
+    </div>
+    <script>
+        const list = document.getElementById('list');
+        const addDataDialogBtn = document.getElementById('addDataDialogBtn');        
+        const closeAddDataBtn = document.getElementById('closeAddDataBtn');
+        const dialogContainer = document.getElementById('dialogContainer');
+        const nameInput = document.getElementById('name');
+        const scoreInput = document.getElementById('score');
+        const addDataBtn = document.getElementById('addDataBtn');
+        const info = document.getElementById('info');
+        const searchBar = document.getElementById('searchBar');
+        const sortByNameBtn = document.getElementById('sortByNameBtn');
+
+        let students = [];
+        let editIndex = -1;
+
+        addDataDialogBtn.addEventListener('click', function() {
+            dialogContainer.style.display = 'flex';   
+            setTimeout(function() {
+                dialogContainer.style.opacity = 1;
+            }, 100);         
+        });
+
+        closeAddDataBtn.addEventListener('click', closeDialog);
+        function closeDialog() {
+            dialogContainer.style.opacity = 0;
+            setTimeout(function() {
+                dialogContainer.style.display = 'none';
+            }, 100);
+        }
+
+        addDataBtn.onclick = function() {
+            let name = nameInput.value;
+            let score = scoreInput.value;
+            if (name !== '' && score !== '') {
+                if (editIndex === -1) {
+                    students.push({ name: name, score: parseInt(score) });
+                } else {
+                    students[editIndex] = { name: name, score: parseInt(score) };
+                    editIndex = -1;
+                }
+                nameInput.value = '';
+                scoreInput.value = '';
+                displayList();
+                closeDialog();    
+            } else {
+                alert("Please fill all the fields");
+            }
+        };
+
+        function displayList() {
+            students.sort(function(a, b) {
+                return b.score - a.score;
+            });
+
+            let total = 0;
+            let max = 0;
+            let min = 100;
+
+            students.forEach(function(student) {
+                student.score = parseInt(student.score);
+                if (student.score > max) {
+                    max = student.score;
+                }
+                if (student.score < min) {
+                    min = student.score;
+                }
+                total += student.score;
+            });
+
+            let average = total / students.length;
+            info.innerHTML = `No. of Students: ${students.length} <br>`;
+            info.innerHTML += `Max: ${max} | Min: ${min} | Avg: ${average.toFixed(2)}`;
+
+            list.innerHTML = '';
+            students.forEach(function(student, index) {
+                let record = document.createElement('tr');
+                let td0 = document.createElement('td');
+                td0.innerHTML = index + 1;
+                let td1 = document.createElement('td');
+                td1.innerHTML = student.name;
+                let td2 = document.createElement('td');
+                td2.innerHTML = student.score;
+                let td3 = document.createElement('td');
+                let deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = 'X';
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.onclick = function() {
+                    if (!confirm('Are you sure you want to remove?')) {
+                        return;
+                    }
+                    students.splice(index, 1);
+                    displayList();
+                };
+                let editBtn = document.createElement('button');
+                editBtn.innerHTML = 'E';
+                editBtn.classList.add('edit-btn');
+                editBtn.onclick = function() {
+                    nameInput.value = student.name;
+                    scoreInput.value = student.score;
+                    editIndex = index;
+                    dialogContainer.style.display = 'flex';
+                    setTimeout(function() {
+                        dialogContainer.style.opacity = 1;
+                    }, 100);
+                };
+                td3.appendChild(editBtn);
+                td3.appendChild(deleteBtn);
+
+                record.appendChild(td0);
+                record.appendChild(td1);
+                record.appendChild(td2);
+                record.appendChild(td3);
+
+                list.appendChild(record);
+            });
+        }
+
+        searchBar.addEventListener('input', function() {
+            let searchTerm = searchBar.value.toLowerCase();
+            let filteredStudents = students.filter(function(student) {
+                return student.name.toLowerCase().includes(searchTerm);
+            });
+            displayFilteredList(filteredStudents);
+        });
+
+        function displayFilteredList(filteredStudents) {
+            list.innerHTML = '';
+            filteredStudents.forEach(function(student, index) {
+                let record = document.createElement('tr');
+                let td0 = document.createElement('td');
+                td0.innerHTML = index + 1;
+                let td1 = document.createElement('td');
+                td1.innerHTML = student.name;
+                let td2 = document.createElement('td');
+                td2.innerHTML = student.score;
+                let td3 = document.createElement('td');
+                let deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = 'X';
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.onclick = function() {
+                    if (!confirm('Are you sure you want to remove?')) {
+                        return;
+                    }
+                    let index = students.indexOf(student);
+                    students.splice(index, 1);
+                    displayList();
+                };
+                let editBtn = document.createElement('button');
+                editBtn.innerHTML = 'E';
+                editBtn.classList.add('edit-btn');
+                editBtn.onclick = function() {
+                    nameInput.value = student.name;
+                    scoreInput.value = student.score;
+                    editIndex = index;
+                    dialogContainer.style.display = 'flex';
+                    setTimeout(function() {
+                        dialogContainer.style.opacity = 1;
+                    }, 100);
+                };
+                td3.appendChild(editBtn);
+                td3.appendChild(deleteBtn);
+
+                record.appendChild(td0);
+                record.appendChild(td1);
+                record.appendChild(td2);
+                record.appendChild(td3);
+
+                list.appendChild(record);
+            });
+        }
+
+        sortByNameBtn.addEventListener('click', function() {
+            students.sort(function(a, b) {
+                return a.name.localeCompare(b.name);
+            });
+            displayList();
+        });
+    </script>       
+</body>
+</html>
