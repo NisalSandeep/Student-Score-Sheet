@@ -15,12 +15,12 @@ Features
 
 📊 Live Statistics: View real-time stats including:
 
-Total number of students
+  Total number of students
 
-Maximum score
+  Maximum score
 
-Minimum score
+  Minimum score
 
-Average score
+  Average score
 
 📱 Responsive Design: Clean and user-friendly interface optimized for different screen sizes.
